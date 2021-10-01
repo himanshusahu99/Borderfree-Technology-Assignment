@@ -1,0 +1,103 @@
+<html>
+
+<head>
+     <title>Assignment</title>
+     <style>
+          input {
+               width: 300px;
+               height: 50px;
+          }
+     </style>
+</head>
+
+<body>
+     <input type="text" id="search">
+     <ul id="main"></ul>
+
+</body>
+
+
+<script>
+
+     const input = document.getElementById("search")
+     const ul = document.getElementById("main")
+     // const ul = document.createElement("ul");
+
+
+     input.addEventListener('input', callAPI);
+
+     function callAPI(e) {
+          console.log(e.target.value)
+          fetch("/getsearch", {
+               method: "POST",
+               headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+               },
+               body: JSON.stringify({
+                    title: e.target.value
+               })
+          }).then(res => res.json()).then(showItem);
+     }
+
+     function showItem(data) {
+          // console.log(data[0]);
+          // console.log(data[0].length, "length ")
+
+          var arr = [];
+          for (item in data[0]) {
+               arr.push(data[0][item]);
+          }
+
+          // let ok = Object.keys(data[0])
+          console.log(arr)
+
+
+          showdata(arr);
+     }
+
+     function showdata(arr) {
+
+          if (input.value == "") { ul.innerHTML = ""; return }
+
+          ul.innerHTML = "";
+
+          if (arr.length == 0) {
+               let li = document.createElement("li");
+               li.innerHTML = "NO result";
+               ul.appendChild(li);
+               return;
+
+          }
+
+          for (let i = 0; i < arr.length; i++) {
+               let li = document.createElement("li");
+               let a = document.createElement("a");
+               a.href = "/showdata";
+               a.target = "_blank";
+               a.id = i;
+               a.innerHTML = arr[i].title
+               a.addEventListener("click", () => {
+                    fetch("/getClick", {
+                         method: "POST",
+                         headers: {
+                              'Content-Type': 'application/json',
+                              'Accept': 'application/json'
+                         },
+                         body: JSON.stringify({
+                              title: arr[i].title,
+                              desc: arr[i].desc
+                         })
+                    }).then(res => res.json()).then(cosole.log("success"));
+               })
+
+               li.appendChild(a);
+               ul.appendChild(li);
+               console.log("inside main");
+          }
+
+
+     }
+</script>
+
+</html>
